@@ -16,6 +16,8 @@
 package io.netty.example.discard;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -26,6 +28,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+
+import java.nio.charset.Charset;
 
 /**
  * Keeps sending random data to the specified address.
@@ -65,7 +69,10 @@ public final class DiscardClient {
 
             // Make the connection attempt.
             ChannelFuture f = b.connect(HOST, PORT).sync();
-
+            ByteBuf buffer = Unpooled.buffer(10);
+            buffer.writeCharSequence("hello", Charset.forName("UTF-8"));
+            //写入数据
+            f.channel().writeAndFlush(buffer);
             // Wait until the connection is closed.
             f.channel().closeFuture().sync();
         } finally {

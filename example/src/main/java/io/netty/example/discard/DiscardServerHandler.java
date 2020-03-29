@@ -15,17 +15,25 @@
  */
 package io.netty.example.discard;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
+
+import java.nio.charset.Charset;
 
 /**
  * Handles a server-side channel.
  */
-public class DiscardServerHandler extends SimpleChannelInboundHandler<Object> {
+public class DiscardServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         // discard
+        ByteBuf buffer = (ByteBuf) msg;
+        byte[] bytes = new byte[buffer.readableBytes()];
+        buffer.getBytes(0,bytes);
+        System.out.println(new String(bytes, Charset.forName("UTF-8")));
     }
 
     @Override
