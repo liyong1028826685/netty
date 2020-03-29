@@ -169,6 +169,13 @@
       <groupId>com.sun.activation</groupId>
       <artifactId>javax.activation</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.38</version>
+    </dependency>
+
   </dependencies>
 
   <build>

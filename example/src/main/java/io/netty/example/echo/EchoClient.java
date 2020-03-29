@@ -16,14 +16,15 @@
 package io.netty.example.echo;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
+import io.netty.buffer.*;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -65,7 +66,9 @@ public final class EchoClient {
                      if (sslCtx != null) {
                          p.addLast(sslCtx.newHandler(ch.alloc(), HOST, PORT));
                      }
-                     //p.addLast(new LoggingHandler(LogLevel.INFO));
+//                     p.addLast(new LoggingHandler(LogLevel.INFO));
+                     p.addLast("decoder", new StringDecoder());
+                     p.addLast("encoder", new StringEncoder());
                      p.addLast(new EchoClientHandler());
                  }
              });
@@ -73,7 +76,8 @@ public final class EchoClient {
             // Start the client.
             ChannelFuture f = b.connect(HOST, PORT).sync();
 
-            // Wait until the connection is closed.
+           f.channel().writeAndFlush("xxoo");
+
             f.channel().closeFuture().sync();
         } finally {
             // Shut down the event loop to terminate all threads.

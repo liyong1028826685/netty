@@ -18,16 +18,18 @@ package io.netty.example.echo;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * Handler implementation for the echo server.
  */
 @Sharable
-public class EchoServerHandler extends ChannelInboundHandlerAdapter {
+public class EchoServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        ctx.write(msg);
+    protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+        ctx.write("Server write"+msg);
+        System.out.println("The recive data is "+msg);
     }
 
     @Override
