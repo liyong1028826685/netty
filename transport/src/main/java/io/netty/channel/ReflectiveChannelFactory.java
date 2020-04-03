@@ -38,6 +38,16 @@ public class ReflectiveChannelFactory<T extends Channel> implements ChannelFacto
         }
     }
 
+    /***
+     *
+     * 通过反射获取实例 需提供无参构造函数
+     *
+     * @author liyong
+     * @date 20:47 2020-03-29
+     * @param
+     * @exception
+     * @return T
+     **/
     @Override
     public T newChannel() {
         try {

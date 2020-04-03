@@ -372,6 +372,16 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         return loop instanceof NioEventLoop;
     }
 
+    /***
+     *
+     * 使用Jdk的select模式注册一个Selector
+     *
+     * @author liyong
+     * @date 16:25 2020-04-01
+     * @param
+     * @exception
+     * @return void
+     **/
     @Override
     protected void doRegister() throws Exception {
         boolean selected = false;

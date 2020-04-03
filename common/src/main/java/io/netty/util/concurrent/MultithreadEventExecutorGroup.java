@@ -31,9 +31,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class MultithreadEventExecutorGroup extends AbstractEventExecutorGroup {
 
     private final EventExecutor[] children;
+    /** 只读的EventLoop实现  */
     private final Set<EventExecutor> readonlyChildren;
+    /** 终止计数 */
     private final AtomicInteger terminatedChildren = new AtomicInteger();
     private final Promise<?> terminationFuture = new DefaultPromise(GlobalEventExecutor.INSTANCE);
+    /** 当前选择出的EventLoop */
     private final EventExecutorChooserFactory.EventExecutorChooser chooser;
 
     /**
@@ -73,14 +76,16 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
         }
 
         if (executor == null) {
+            //构建一个默认的执行器，并使用自定义ThreadFactory
             executor = new ThreadPerTaskExecutor(newDefaultThreadFactory());
         }
-
+        //根据线程数量分配一个事件执行器数组
         children = new EventExecutor[nThreads];
 
         for (int i = 0; i < nThreads; i ++) {
             boolean success = false;
             try {
+                //NioEventLoop数组，每一个EventLoop绑定一个或多个channel
                 children[i] = newChild(executor, args);
                 success = true;
             } catch (Exception e) {
@@ -108,17 +113,21 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
             }
         }
 
+        //通过选择器工厂通过EventLoop数组中元素个数获取选择器
         chooser = chooserFactory.newChooser(children);
 
+        //终止计数，当所有EventExecutor都被终止时阻塞结束
         final FutureListener<Object> terminationListener = new FutureListener<Object>() {
             @Override
             public void operationComplete(Future<Object> future) throws Exception {
+                //当所有的EventLoop都被终止是返回
                 if (terminatedChildren.incrementAndGet() == children.length) {
                     terminationFuture.setSuccess(null);
                 }
             }
         };
 
+        //循环添加一个终止监听器
         for (EventExecutor e: children) {
             e.terminationFuture().addListener(terminationListener);
         }
@@ -134,7 +143,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
 
     @Override
     public EventExecutor next() {
-        return chooser.next();
+        return chooser.next();//获取EventLoop实例
     }
 
     @Override

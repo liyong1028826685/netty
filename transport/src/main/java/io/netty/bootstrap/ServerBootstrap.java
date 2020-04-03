@@ -51,7 +51,9 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     private final Map<ChannelOption<?>, Object> childOptions = new LinkedHashMap<ChannelOption<?>, Object>();
     private final Map<AttributeKey<?>, Object> childAttrs = new ConcurrentHashMap<AttributeKey<?>, Object>();
     private final ServerBootstrapConfig config = new ServerBootstrapConfig(this);
+    /** worker or child */
     private volatile EventLoopGroup childGroup;
+    /** worker or child Handler */
     private volatile ChannelHandler childHandler;
 
     public ServerBootstrap() { }
@@ -127,9 +129,21 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         return this;
     }
 
+    /***
+     *
+     * 初始化Channel相关配置
+     *
+     * @author liyong
+     * @date 15:56 2020-04-01
+     * @param channel
+     * @exception
+     * @return void
+     **/
     @Override
     void init(Channel channel) {
+        //设置Channel的Option
         setChannelOptions(channel, newOptionsArray(), logger);
+        //设置Channel的Attribute
         setAttributes(channel, attrs0().entrySet().toArray(EMPTY_ATTRIBUTE_ARRAY));
 
         ChannelPipeline p = channel.pipeline();
@@ -175,6 +189,15 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         return this;
     }
 
+    /***
+     *@className ServerBootstrap
+     *@description 接受客户端连接处理器
+     *@author <a href="http://youngitman.tech">青年IT男</a>
+     *@date 16:03 2020-04-01
+     *@JunitTest: {@link  }
+     *@version v1.0.0
+     *
+    **/
     private static class ServerBootstrapAcceptor extends ChannelInboundHandlerAdapter {
 
         private final EventLoopGroup childGroup;

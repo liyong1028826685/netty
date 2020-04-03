@@ -17,6 +17,20 @@ package io.netty.util.concurrent;
 
 import io.netty.util.internal.ObjectUtil;
 
+/***
+ *@className FastThreadLocalRunnable
+ *
+ *@description 封装对FastThreadLocal的删除操作
+ *
+ *@author  <a href="http://youngitman.tech">青年IT男</a>
+ *
+ *@date 14:03 2020-04-01
+ *
+ *@junitTest: {@link  }
+ *
+ *@version v1.0.0
+ *
+**/
 final class FastThreadLocalRunnable implements Runnable {
     private final Runnable runnable;
 

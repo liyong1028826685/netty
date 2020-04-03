@@ -45,7 +45,7 @@ public abstract class MultithreadEventLoopGroup extends MultithreadEventExecutor
         }
     }
 
-    /**
+    /** args : 0 = {KQueueSelectorProvider@1102} 1 = {DefaultSelectStrategyFactory@1105} 2 = {RejectedExecutionHandlers$1@1110}
      * @see MultithreadEventExecutorGroup#MultithreadEventExecutorGroup(int, Executor, Object...)
      */
     protected MultithreadEventLoopGroup(int nThreads, Executor executor, Object... args) {

@@ -140,6 +140,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         this.provider = ObjectUtil.checkNotNull(selectorProvider, "selectorProvider");
         this.selectStrategy = ObjectUtil.checkNotNull(strategy, "selectStrategy");
         final SelectorTuple selectorTuple = openSelector();
+        //Selector被包装
         this.selector = selectorTuple.selector;
         this.unwrappedSelector = selectorTuple.unwrappedSelector;
     }
@@ -167,9 +168,20 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
     }
 
+    /***
+     *
+     * 使用Jdk提供的Nio的Selector实现，并且替换selectedKeys、publicSelectedKeys的值为SelectedSelectionKeySet
+     *
+     * @author liyong
+     * @date 14:46 2020-04-01
+     * @param
+     * @exception
+     * @return io.netty.channel.nio.NioEventLoop.SelectorTuple
+     **/
     private SelectorTuple openSelector() {
         final Selector unwrappedSelector;
         try {
+            //获取Jdk提供的Nio Selector
             unwrappedSelector = provider.openSelector();
         } catch (IOException e) {
             throw new ChannelException("failed to open a new selector", e);
@@ -179,6 +191,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             return new SelectorTuple(unwrappedSelector);
         }
 
+        //通过沙箱机制去获取Selector的实现实例
         Object maybeSelectorImplClass = AccessController.doPrivileged(new PrivilegedAction<Object>() {
             @Override
             public Object run() {
@@ -213,6 +226,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                     Field selectedKeysField = selectorImplClass.getDeclaredField("selectedKeys");
                     Field publicSelectedKeysField = selectorImplClass.getDeclaredField("publicSelectedKeys");
 
+                    //高版本 支持unsafe操作直接通过unsafe操作内存地址修改值
                     if (PlatformDependent.javaVersion() >= 9 && PlatformDependent.hasUnsafe()) {
                         // Let us try to use sun.misc.Unsafe to replace the SelectionKeySet.
                         // This allows us to also do this in Java9+ without any extra flags.
@@ -220,6 +234,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                         long publicSelectedKeysFieldOffset =
                                 PlatformDependent.objectFieldOffset(publicSelectedKeysField);
 
+                        //替换selectedKeys和publicSelectedKeys的值为 SelectedSelectionKeySet
                         if (selectedKeysFieldOffset != -1 && publicSelectedKeysFieldOffset != -1) {
                             PlatformDependent.putObject(
                                     unwrappedSelector, selectedKeysFieldOffset, selectedKeySet);
@@ -238,7 +253,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                     if (cause != null) {
                         return cause;
                     }
-
+                    //替换selectedKeys和publicSelectedKeys的值为 SelectedSelectionKeySet
                     selectedKeysField.set(unwrappedSelector, selectedKeySet);
                     publicSelectedKeysField.set(unwrappedSelector, selectedKeySet);
                     return null;

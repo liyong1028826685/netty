@@ -18,6 +18,11 @@ package io.netty.channel;
 import io.netty.util.concurrent.OrderedEventExecutor;
 
 /**
+ * 一个 EventLoop 在它的生命周期内只和一个 Thread 绑定
+ * 一个 EventLoop 可能会被分配给一个或多个 Channel。
+ * 一个 Channel 在它的生命周期内只注册于一个 EventLoop
+ * 所有由 EventLoop 处理的 I/O 事件都将在它专有的 Thread 上被处理;
+ *
  * Will handle all the I/O operations for a {@link Channel} once registered.
  *
  * One {@link EventLoop} instance will usually handle more than one {@link Channel} but this may depend on

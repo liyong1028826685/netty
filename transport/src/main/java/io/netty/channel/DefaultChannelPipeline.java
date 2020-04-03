@@ -203,7 +203,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
 
             newCtx = newContext(group, filterName(name, handler), handler);
 
-            addLast0(newCtx);
+            addLast0(newCtx);//插入到tail前面
 
             // If the registered is false it means that the channel was not registered on an eventLoop yet.
             // In this case we add the context to the pipeline and add a task that will call
@@ -641,6 +641,16 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         }
     }
 
+    /***
+     *
+     * 调用Handler的HandlerAdded方法回掉 ，只有在第一次使用时候回掉
+     *
+     * @author liyong
+     * @date 16:29 2020-04-01
+     * @param
+     * @exception
+     * @return void
+     **/
     final void invokeHandlerAddedIfNeeded() {
         assert channel.eventLoop().inEventLoop();
         if (firstRegistration) {
@@ -1094,6 +1104,16 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         }
     }
 
+    /***
+     *
+     * 回掉HandlerAdded方法
+     *
+     * @author liyong
+     * @date 16:45 2020-04-01
+     * @param
+     * @exception
+     * @return void
+     **/
     private void callHandlerAddedForAllHandlers() {
         final PendingHandlerCallback pendingHandlerCallbackHead;
         synchronized (this) {
@@ -1116,7 +1136,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
             task = task.next;
         }
     }
-
+    //增加HandlerAdded或HandlerRemoved任务 ，构建一个调用链
     private void callHandlerCallbackLater(AbstractChannelHandlerContext ctx, boolean added) {
         assert !registered;
 
@@ -1125,6 +1145,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         if (pending == null) {
             pendingHandlerCallbackHead = task;
         } else {
+            //增加到tail尾部
             // Find the tail of the linked-list.
             while (pending.next != null) {
                 pending = pending.next;
